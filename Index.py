@@ -1,8 +1,7 @@
-import data_object
-from script import read_from_file
-from flask import request, jsonify, make_response
 from data_object.reaquest_data import req_data
 from flask_api import status
+from script import read_from_file
+from flask import make_response, jsonify, request
 from database_interaction import (
     database_delete,
     database_insert,
