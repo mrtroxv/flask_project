@@ -1,4 +1,3 @@
-from re import M
 import sys
 
 sys.path.append("../")
@@ -8,48 +7,32 @@ from validation import insert_and_update_validation
 from sqlalchemy.exc import IntegrityError
 
 
-def insert_data(my_file):
+def insert_data(my_file, tag):
     for i in my_file:
         if not insert_and_update_validation.is_valid_insert(i):
             print("id :", i["id"], "the data skiped")
             continue
         else:
-            i["tag"] = "new"
+            i["tag"] = tag
             try:
                 database_insert.insert_mydata(i)
             except IntegrityError:
                 ur_choice = input(
-                    "u have simelr id, if u want to keep ur data press 2 or 1 to update ur data : "
+                    "you have similar id, if u want to replace ur data type 1: "
                 )
+                database.db.session.rollback()
                 if ur_choice == "1":
-                    database.db.session.rollback()
                     database_update.update(i, i["id"])
-                else:
-                    database.db.session.rollback()
 
 
-def read_from_file_new_song():
-
-    f = open("..\my_file\data_new.json", "r+")
+def read_from_file(tag):
+    f_path = f"..\my_file\data_{tag}.json"
+    f = open(f_path, "r+")
     my_file = json.load(f)
-    insert_data(my_file)
-
-
-def read_from_file_trending_song():
-
-    f = open("..\my_file\data_trending.json", "r+")
-    my_file = json.load(f)
-    insert_data(my_file)
-
-
-def read_from_file_popular_song():
-
-    f = open("..\my_file\data_popular.json", "r+")
-    my_file = json.load(f)
-    insert_data(my_file)
+    insert_data(my_file, tag)
 
 
 if __name__ == "__main__":
-    read_from_file_new_song()
-    read_from_file_trending_song()
-    read_from_file_popular_song()
+    array_of_tags = ["new", "popular", "trending"]
+    for tag in array_of_tags:
+        read_from_file(tag)
