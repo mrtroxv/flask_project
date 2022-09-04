@@ -1,3 +1,6 @@
+from fileinput import filename
+import json
+from script import read_from_file
 from flask import request, jsonify, make_response
 from flask_api import status
 from database_interaction import (
@@ -63,6 +66,16 @@ def update(id: int):
     else:
         database_update.update(req, id)
         return make_response("the data updated", status.HTTP_200_OK)
+
+
+# *************************insert file Api***********************************#
+@app.route("/song_as_file", methods=["POST"])
+def insert_file():
+    my_file = request.files["data_file"]
+    tag = request.form["tag"]
+    force_replace = request.form["force_replace"]
+    read_from_file.read_from_file_api(my_file, tag, force_replace)
+    return "you'r data is uptodate "
 
 
 app.run(debug=True)
