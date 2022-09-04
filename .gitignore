@@ -3,3 +3,5 @@ __pycache__/
 db/
 old_api/
 cash.txt
+.vscode/
+my_file/
