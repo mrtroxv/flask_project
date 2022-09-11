@@ -2,7 +2,6 @@ from database_interaction import database
 
 
 def update(my_dict, id):
-    print(my_dict, id)
     our_dict = database.db.session.query(database.song).filter_by(id=id).first_or_404()
     for i in my_dict:
         if i == "name":

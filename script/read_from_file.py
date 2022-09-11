@@ -1,10 +1,22 @@
 import sys
+from flask_api import status
 
 sys.path.append("../")
 import json
 from database_interaction import database_insert, database_update, database
 from validation import insert_and_update_validation
 from sqlalchemy.exc import IntegrityError
+
+
+def handle_intergrity_error(from_api, force_replace, i):
+    database.db.session.rollback()
+    if not from_api:
+        ur_choice = input("you have similar id, if u want to replace ur data type 1: ")
+        if ur_choice == "1":
+            database_update.update(i, i["id"])
+    else:
+        if force_replace:
+            database_update.update(i, i["id"])
 
 
 def insert_data(my_file, tag, force_replace, from_api):
@@ -17,16 +29,7 @@ def insert_data(my_file, tag, force_replace, from_api):
             try:
                 database_insert.insert_mydata(i)
             except IntegrityError:
-                database.db.session.rollback()
-                if not from_api:
-                    ur_choice = input(
-                        "you have similar id, if u want to replace ur data type 1: "
-                    )
-                    if ur_choice == "1":
-                        database_update.update(i, i["id"])
-                else:
-                    if force_replace:
-                        database_update.update(i, i["id"])
+                handle_intergrity_error(from_api, force_replace, i)
 
 
 def read_from_file(tag):
@@ -37,14 +40,19 @@ def read_from_file(tag):
 
 
 def read_from_file_api(my_file, tag, force_replace):
-    my_file_content = json.load(my_file)
-    my_file_name = my_file.filename
-    tag = my_file_name[5 : len(my_file_name) - 5]
-    if force_replace == "True":
+    from_api = True
+    try:
+        my_file_content = json.load(my_file)
+    except UnicodeDecodeError:
+        return False
+
+    if str.lower(force_replace) == "true":
         force_replace = True
     else:
         force_replace = False
-    insert_data(my_file_content, tag, force_replace, True)
+
+    insert_data(my_file_content, tag, force_replace, from_api)
+    return True
 
 
 if __name__ == "__main__":
