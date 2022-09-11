@@ -1,4 +1,6 @@
 from data_object.reaquest_data import req_data
+from script import read_from_file
+from flask import request, jsonify, make_response
 from flask_api import status
 from script import read_from_file
 from flask import make_response, jsonify, request
@@ -70,19 +72,18 @@ def update(id: int):
 # *************************insert file Api***********************************#
 @app.route("/song_as_file", methods=["POST"])
 def insert_file():
-    the_req_obj = req_data(
-        request.files.get("data_file"),
-        request.form.get("tag"),
-        request.form.get("force_replace"),
-    )
-    if not content_validation.is_valid(the_req_obj):
-        return make_response("Content is not valid", status.HTTP_400_BAD_REQUEST)
+    my_contant = {}
+    my_contant["my_file"] = request.files.get("data_file")
+    my_contant["tag"] = request.form.get("tag")
+    my_contant["force_replace"] = request.form.get("force_replace")
+    if not contanet_validation.is_valid(my_contant):
+        return make_response("Bad request", status.HTTP_400_BAD_REQUEST)
     else:
-        the_req_obj = content_validation.content_make_valid(the_req_obj)
-        if not read_from_file.read_from_file_api(the_req_obj):
-            return make_response(
-                "the content has not correct format", status.HTTP_400_BAD_REQUEST
-            )
+        my_contant = contanet_validation.contatnt_make_valid(my_contant)
+        if not read_from_file.read_from_file_api(
+            my_contant["my_file"], my_contant["tag"], my_contant["force_replace"]
+        ):
+            return make_response("Bad Request", status.HTTP_400_BAD_REQUEST)
         return make_response("your data is uptodate", status.HTTP_200_OK)
 
 
