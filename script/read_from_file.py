@@ -1,5 +1,5 @@
 import sys
-from flask_api import status
+
 
 
 sys.path.append("../")
@@ -54,15 +54,12 @@ def read_from_file_api(my_obj):
 def read_from_file_api(my_file, tag, force_replace):
     from_api = True
     try:
-        my_file_content = json.load(my_file)
+        my_file_content = json.load(my_obj.my_file)
     except UnicodeDecodeError:
         return False
 
-    if str.lower(force_replace) == "true":
-        force_replace = True
-    else:
-        force_replace = False
-
+    tag = my_obj.my_tag
+    force_replace = my_obj.my_force_replace
     insert_data(my_file_content, tag, force_replace, from_api)
     return True
 
