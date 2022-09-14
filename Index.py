@@ -1,5 +1,4 @@
 from data_object.reaquest_data import req_data
-import data_object
 from script import read_from_file
 from flask import request, jsonify, make_response
 from data_object.reaquest_data import req_data
