@@ -1,5 +1,4 @@
 from data_object.reaquest_data import req_data
-import data_object
 from script import read_from_file
 from flask import request, jsonify, make_response
 from data_object.reaquest_data import req_data
@@ -74,7 +73,6 @@ def update(id: int):
 # *************************insert file Api***********************************#
 @app.route("/song_as_file", methods=["POST"])
 def insert_file():
-<<<<<<< Updated upstream
     the_req_obj = req_data(
         request.files.get("data_file"),
         request.form.get("tag"),
@@ -108,23 +106,6 @@ def select_name():
     if database_select.select_by_filters(st, page) == False:
         return make_response("invalid date value", status.HTTP_400_BAD_REQUEST)
     content = jsonify(database_select.select_by_filters(st, page))
-=======
-    my_file = request.files["data_file"]
-    tag = request.form["tag"]
-    force_replace = request.form["force_replace"]
-    read_from_file.read_from_file_api(my_file, tag, force_replace)
-    return "you'r data is up to date "
-
-
-@app.route("/song_select/<int:page>", methods=["GET"])
-def select_name(page):
-    st = request.json
-    for i in st:
-        if i == "name":
-            content = jsonify(database_select.select_by_name(st.get("name"), page))
-        if i == "author":
-            content = jsonify(database_select.select_by_name(st.get("name"), page))
->>>>>>> Stashed changes
     return make_response(content, status.HTTP_200_OK)
 
 
