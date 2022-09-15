@@ -1,4 +1,6 @@
-from flask import request, jsonify, make_response
+from script import read_from_file
+from flask import request, make_response
+from data_object.request_data import FileInsertionRequestData
 from flask_api import status
 from database_interaction import (
     database_delete,
@@ -7,7 +9,7 @@ from database_interaction import (
     database_update,
 )
 from database_interaction.database import app
-from validation import insert_and_update_validation, is_valid_id
+from validation import insert_and_update_validation, is_valid_id, content_validation
 from sqlalchemy.exc import IntegrityError
 
 
@@ -63,6 +65,25 @@ def update(id: int):
     else:
         database_update.update(req, id)
         return make_response("the data updated", status.HTTP_200_OK)
+
+
+# *************************insert file Api***********************************#
+@app.route("/song_as_file", methods=["POST"])
+def insert_file():
+    the_req_obj = FileInsertionRequestData(
+        request.files.get("data_file"),
+        request.form.get("tag"),
+        request.form.get("force_replace"),
+    )
+    if not content_validation.is_valid(the_req_obj):
+        return make_response("Content is not valid", status.HTTP_400_BAD_REQUEST)
+    else:
+        the_req_obj = content_validation.content_make_valid(the_req_obj)
+        if not read_from_file.read_from_file_api(the_req_obj):
+            return make_response(
+                "the content has not correct format", status.HTTP_400_BAD_REQUEST
+            )
+        return make_response("your data is uptodate", status.HTTP_200_OK)
 
 
 app.run(debug=True)
