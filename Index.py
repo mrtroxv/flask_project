@@ -1,10 +1,7 @@
-from data_object.reaquest_data import req_data
 from script import read_from_file
-from flask import request, jsonify, make_response
-from data_object.reaquest_data import req_data
+from flask import request, make_response
+from data_object.request_data import FileInsertionRequestData
 from flask_api import status
-from script import read_from_file
-from flask import make_response, jsonify, request
 from database_interaction import (
     database_delete,
     database_insert,
@@ -73,7 +70,7 @@ def update(id: int):
 # *************************insert file Api***********************************#
 @app.route("/song_as_file", methods=["POST"])
 def insert_file():
-    the_req_obj = req_data(
+    the_req_obj = FileInsertionRequestData(
         request.files.get("data_file"),
         request.form.get("tag"),
         request.form.get("force_replace"),
