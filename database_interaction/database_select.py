@@ -1,5 +1,4 @@
 from datetime import datetime
-from logging import exception, raiseExceptions
 import re
 from database_interaction import database
 from patterns import date_pattern
