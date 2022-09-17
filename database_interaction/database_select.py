@@ -1,5 +1,8 @@
 from datetime import datetime
+from logging import exception, raiseExceptions
+import re
 from database_interaction import database
+from patterns import date_pattern
 from filters import (
     name_filter,
     author_filter,
@@ -8,7 +11,6 @@ from filters import (
     rating_filter,
     time_filter,
 )
-from database_interaction import database
 
 
 def select(id):
@@ -18,48 +20,65 @@ def select(id):
     return model_dict
 
 
-def select_by_filters(st, page):
-    my_obj_dict = {}
-    my_list = []
-    my_select_dict = database.db.session.query(database.song)
-    for i in st:
+def select_by_filters(request_data, page):
+    list_of_song = []
+    dict_of_select = database.db.session.query(database.song)
+    for i in request_data:
         if i == "name":
-            name = st.get("name")
-            my_select_dict = name_filter.filter_by_name(name, my_select_dict)
+            name = request_data.get("name")
+            dict_of_select = name_filter.filter_by_name(name, dict_of_select)
         if i == "author":
-            author = st.get("author")
-            my_select_dict = author_filter.filter_by_author(author, my_select_dict)
+            author = request_data.get("author")
+            dict_of_select = author_filter.filter_by_author(author, dict_of_select)
         if i == "type":
-            type = st.get("type")
-            my_select_dict = type_filter.filter_by_type(type, my_select_dict)
+            type = request_data.get("type")
+            dict_of_select = type_filter.filter_by_type(type, dict_of_select)
         if i == "tag":
-            tag = st.get("tag")
-            my_select_dict = tag_filter.filter_by_tag(tag, my_select_dict)
+            tag = request_data.get("tag")
+            dict_of_select = tag_filter.filter_by_tag(tag, dict_of_select)
         if i == "rating":
-            rating = float(st.get("rating"))
-            my_select_dict = rating_filter.filter_by_rating(rating, my_select_dict)
+            rating = float(request_data.get("rating"))
+            dict_of_select = rating_filter.filter_by_rating(rating, dict_of_select)
         if i == "time_created":
-            try:
-                time_created = datetime.strptime(st.get("time_created"), "%m/%d/%Y")
-            except ValueError:
-                return False
-            my_select_dict = time_filter.filter_by_time_created(
-                time_created, my_select_dict
+            if (
+                re.fullmatch(
+                    date_pattern.date_pattern, request_data.get("time_created")
+                )
+                == None
+            ):
+                raise Exception("date value incorrect")
+
+            time_created = datetime.strptime(
+                request_data.get("time_created"), "%m/%d/%Y"
+            )
+            dict_of_select = time_filter.filter_by_time_created(
+                time_created, dict_of_select
             )
         if i == "time_updated":
-            try:
-                time_updated = datetime.strptime(st.get("time_updated"), "%m/%d/%Y")
-            except ValueError:
-                return False
-            my_select_dict = time_filter.filter_by_time_updated(
-                time_updated, my_select_dict
+            if (
+                re.fullmatch(
+                    date_pattern.date_pattern, request_data.get("time_updated")
+                )
+                == None
+            ):
+                raise Exception("date value incorrect")
+
+            time_updated = datetime.strptime(
+                request_data.get("time_updated"), "%m/%d/%Y"
             )
 
-    my_select_dict = my_select_dict.paginate(page, per_page=10)
+            dict_of_select = time_filter.filter_by_time_updated(
+                time_updated, dict_of_select
+            )
 
-    my_page = vars(my_select_dict)
-    for i in my_page["items"]:
-        my_obj_dict = vars(i)
-        del my_obj_dict["_sa_instance_state"]
-        my_list.append(my_obj_dict)
-    return my_list
+    dict_of_select = dict_of_select.paginate(page, per_page=10)
+
+    my_page = vars(dict_of_select)
+
+    def serialize_song(song):
+        song_dict = vars(song)
+        song_dict.pop("_sa_instance_state")
+        return song_dict
+
+    list_of_song = [serialize_song(i) for i in my_page["items"]]
+    return list_of_song

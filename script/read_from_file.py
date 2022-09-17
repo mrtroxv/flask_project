@@ -6,6 +6,7 @@ import json
 from database_interaction import database_insert, database_update, database
 from validation import insert_and_update_validation
 from sqlalchemy.exc import IntegrityError
+from script import time_added, time_update
 
 
 def handle_integrity_error(from_api, force_replace, i):
@@ -26,6 +27,8 @@ def insert_data(my_file, tag, force_replace, from_api):
             continue
         else:
             i["tag"] = tag
+            i["time_created"] = time_added.song_time_added()
+            i["time_updated"] = time_update.update_time()
             try:
                 database_insert.insert_mydata(i)
             except IntegrityError:

@@ -1,26 +1,26 @@
 from flask import Flask
 import os
 from flask_sqlalchemy import SQLAlchemy
+
 app = Flask(__name__)
 base_path = os.path.abspath(os.path.dirname(__file__))
 database_uri = "sqlite:///" + os.path.join(base_path, "../db/song.db")
-app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
 db = SQLAlchemy(app)
 
 
 class song(db.Model):
-
-    def __init__(self,  payload: dict):
-        self.id = payload.get('id')
-        self.name = payload.get('name')
-        self.author = payload.get('author')
-        self.type = payload.get('type')
-        self.image_url = payload.get('image_url')
-        self.file_url = payload.get('file_url')
-        self.rating = payload.get('rating')
-        self.tag = payload.get('tag')
-        self.time_created = payload.get('time_created')
-        self.time_updated = payload.get('time_updated')
+    def __init__(self, payload: dict):
+        self.id = payload.get("id")
+        self.name = payload.get("name")
+        self.author = payload.get("author")
+        self.type = payload.get("type")
+        self.image_url = payload.get("image_url")
+        self.file_url = payload.get("file_url")
+        self.rating = payload.get("rating")
+        self.tag = payload.get("tag")
+        self.time_created = payload.get("time_created")
+        self.time_updated = payload.get("time_updated")
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))

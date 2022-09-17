@@ -1,5 +1,5 @@
 from datetime import datetime
 
 
-def my_update_time():
+def update_time():
     return datetime.now()
