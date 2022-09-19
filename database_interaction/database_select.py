@@ -1,4 +1,6 @@
 from datetime import datetime
+from validation import validate_date
+from flask_restful import reqparse
 import re
 from database_interaction import database
 from patterns import date_pattern
@@ -9,6 +11,15 @@ from filters import (
     tag_filter,
     rating_filter,
     time_filter,
+)
+
+parser = reqparse.RequestParser()
+parser.add_argument(
+    "time_created",
+    "time_updated",
+    type=validate_date.valid_date,
+    required=True,
+    help="invalid date value",
 )
 
 
@@ -39,33 +50,12 @@ def select_by_filters(request_data, page):
             rating = float(request_data.get("rating"))
             dict_of_select = rating_filter.filter_by_rating(rating, dict_of_select)
         if i == "time_created":
-            if (
-                re.fullmatch(
-                    date_pattern.date_pattern, request_data.get("time_created")
-                )
-                == None
-            ):
-                raise Exception("date value incorrect")
-
-            time_created = datetime.strptime(
-                request_data.get("time_created"), "%m/%d/%Y"
-            )
+            time_created = parser.parse_args().get("time_created")
             dict_of_select = time_filter.filter_by_time_created(
                 time_created, dict_of_select
             )
         if i == "time_updated":
-            if (
-                re.fullmatch(
-                    date_pattern.date_pattern, request_data.get("time_updated")
-                )
-                == None
-            ):
-                raise Exception("date value incorrect")
-
-            time_updated = datetime.strptime(
-                request_data.get("time_updated"), "%m/%d/%Y"
-            )
-
+            time_updated = parser.parse_args().get("time_updated")
             dict_of_select = time_filter.filter_by_time_updated(
                 time_updated, dict_of_select
             )
