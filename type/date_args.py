@@ -1,5 +1,5 @@
 from datetime import datetime
 
 
-def valid_date(s):
+def date_type(s):
     return datetime.strptime(s, "%m/%d/%Y")
