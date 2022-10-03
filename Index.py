@@ -1,5 +1,5 @@
 from script import read_from_file
-from flask import request, make_response
+from flask import request, make_response, jsonify
 from data_object.request_data import FileInsertionRequestData
 from flask_api import status
 from database_interaction import (
@@ -84,6 +84,28 @@ def insert_file():
                 "the content has not correct format", status.HTTP_400_BAD_REQUEST
             )
         return make_response("your data is uptodate", status.HTTP_200_OK)
+
+
+# ***********************************select by filter Api*******************************#
+@app.route("/song_select", methods=["GET"])
+def select_by_filters():
+    request_data = request.args
+    try:
+        page = int(request_data.get("page"))
+        if page <= 0:
+            return make_response(
+                "the page number must grater than  zero", status.HTTP_400_BAD_REQUEST
+            )
+    except TypeError:
+        page = 1
+    except ValueError:
+        return make_response("invalid page value", status.HTTP_400_BAD_REQUEST)
+
+    try:
+        content = jsonify(database_select.select_by_filters(request_data, page))
+    except:
+        return make_response("invalid date value", status.HTTP_400_BAD_REQUEST)
+    return make_response(content, status.HTTP_200_OK)
 
 
 app.run(debug=True)
