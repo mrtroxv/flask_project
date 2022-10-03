@@ -1,7 +1,4 @@
-from datetime import datetime
-import re
 from database_interaction import database
-from patterns import date_pattern
 from filters import (
     name_filter,
     author_filter,
@@ -39,33 +36,12 @@ def select_by_filters(request_data, page):
             rating = float(request_data.get("rating"))
             dict_of_select = rating_filter.filter_by_rating(rating, dict_of_select)
         if i == "time_created":
-            if (
-                re.fullmatch(
-                    date_pattern.date_pattern, request_data.get("time_created")
-                )
-                == None
-            ):
-                raise Exception("date value incorrect")
-
-            time_created = datetime.strptime(
-                request_data.get("time_created"), "%m/%d/%Y"
-            )
+            time_created = request_data.get("time_created")
             dict_of_select = time_filter.filter_by_time_created(
                 time_created, dict_of_select
             )
         if i == "time_updated":
-            if (
-                re.fullmatch(
-                    date_pattern.date_pattern, request_data.get("time_updated")
-                )
-                == None
-            ):
-                raise Exception("date value incorrect")
-
-            time_updated = datetime.strptime(
-                request_data.get("time_updated"), "%m/%d/%Y"
-            )
-
+            time_updated = request_data.get("time_updated")
             dict_of_select = time_filter.filter_by_time_updated(
                 time_updated, dict_of_select
             )
